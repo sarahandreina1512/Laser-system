@@ -1,0 +1,34 @@
+# Postgres local por defecto. Para Supabase: define DATABASE_URL (postgresql+asyncpg://...) y quita el servicio db.
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: aura
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-aura}
+      POSTGRES_DB: aura
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U aura"]
+      interval: 5s
+      retries: 10
+
+  backend:
+    build: ./backend
+    depends_on:
+      db: { condition: service_healthy }
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-postgresql+asyncpg://aura:${POSTGRES_PASSWORD:-aura}@db:5432/aura}
+      JWT_SECRET: ${JWT_SECRET:?define JWT_SECRET (32+ caracteres)}
+      SUPABASE_URL: ${SUPABASE_URL:-}
+      SUPABASE_KEY: ${SUPABASE_KEY:-}
+      BCV_API_URL: ${BCV_API_URL:-}
+      ADMIN_USER: ${ADMIN_USER:-}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
+
+  frontend:
+    build: ./frontend
+    depends_on: [backend]
+    ports: ["8080:80"]
+
+volumes:
+  pgdata:

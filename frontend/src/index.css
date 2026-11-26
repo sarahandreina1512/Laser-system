@@ -1,0 +1,4 @@
+@tailwind base; @tailwind components; @tailwind utilities;
+body { @apply bg-canvas text-ink text-[14px] antialiased; font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; }
+h1, h2 { @apply text-olive font-semibold; }
+h1 { @apply text-[22px]; }
